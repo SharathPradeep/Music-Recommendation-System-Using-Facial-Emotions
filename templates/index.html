@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>MRSUFE</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{url_for('static',filename='styles.css')}}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container">
+        <h2 class="display-5 mt-4 mb-5 text-center">MUSIC RECOMMENDATION SYSTEM USING FACIAL EMOTIONS</h2>
+
+        <div class="row">
+            <div class="col">
+                <div id="my_camera"></div>
+                <div id="pre_take_buttons" class="mt-3 mb-4">
+                    <!-- This button is shown before the user takes a snapshot -->
+                    <input type=button class="btn btn-dark" value="Click a Selfie" onClick="preview_snapshot()">
+                </div>
+                <div id="post_take_buttons" class="mt-3 mb-4" style="display:none">
+                    <!-- These buttons are shown after a snapshot is taken -->
+                    <input type=button class="btn btn-dark capture-again-btn" value="Capture Again"
+                        onClick="cancel_preview()">
+
+                    <form id="form" action="{{url_for('selfie')}}" method='POST' enctype='multipart/form-data'>
+                        <input id="file1" value="" type="hidden" name='file1'>
+                        <input type=button class="btn btn-dark" value="Predict" onClick="submit_photo()">
+                    </form>
+                </div>
+
+            </div>
+            <div class="col text-center">
+                <div class="upload-div">
+                    <form action="{{url_for('upload')}}" method='POST' enctype='multipart/form-data'>
+                        <input id="file2" type="file" name='file2'>
+                        <input type="submit" value="Predict" name="btn" class="btn btn-dark">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"
+        integrity="sha512-dQIiHSl2hr3NWKKLycPndtpbh5iaHLo6MwrXm7F0FM5e+kL2U16oE9uIwPHUl6fQBeCthiEuV/rzP3MiAB8Vfw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+
+
+    <script>
+
+        Webcam.set({
+            width: 480,
+            height: 480,
+            dest_width: 480,
+            dest_height: 420,
+            image_format: 'png',
+            jpeg_quality: 100,
+        });
+
+        Webcam.attach('#my_camera');
+
+        function preview_snapshot() {
+
+
+            // freeze camera so user can preview current frame
+            Webcam.freeze();
+
+            // swap button sets
+            document.getElementById('pre_take_buttons').style.display = 'none';
+            document.getElementById('post_take_buttons').style.display = '';
+        }
+
+        function cancel_preview() {
+            // cancel preview freeze and return to live camera view
+            Webcam.unfreeze();
+
+            // swap buttons back to first set
+            document.getElementById('pre_take_buttons').style.display = '';
+            document.getElementById('post_take_buttons').style.display = 'none';
+        }
+
+
+        function submit_photo() {
+
+            // take snapshot and get image data
+            Webcam.snap(function (data_uri) {
+
+                var raw_image_data = data_uri.replace(/^data\:image\/\w+\;base64\,/, '');
+                document.getElementById('file1').value = raw_image_data;
+                document.getElementById('form').submit();
+                Webcam.reset();
+
+            });
+        }
+    </script>
+</body>
+
+</html>
